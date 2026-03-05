@@ -1,12 +1,19 @@
 package com.example.foreign.exchange.application.service;
 
+import com.example.foreign.exchange.application.converter.ForeignExchangeExecuteConverter;
+import com.example.foreign.exchange.application.entity.ForeignExchangeExecuteQueryRequestVO;
 import com.example.foreign.exchange.application.entity.ForeignExchangeExecuteRequestVO;
+import com.example.foreign.exchange.application.entity.ForeignExchangeExecuteResponseVO;
+import com.example.foreign.exchange.common.entity.Page;
 import com.example.foreign.exchange.common.redis.RedisIdGenerator;
 import com.example.foreign.exchange.domain.entity.ForeignExchangeOrder;
 import com.example.foreign.exchange.domain.enums.ExecuteStatusEnum;
 import com.example.foreign.exchange.domain.service.ForeignExchangeExecuteDomainService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 外汇执行单应用服务
@@ -48,6 +55,55 @@ public class ForeignExchangeExecuteApplicationService {
         // 调用领域服务保存执行单
         foreignExchangeExecuteDomainService.saveExecuteOrder(order);
         
-        return "生成付款单成功";
+        return "生成教育执行单成功";
+    }
+
+    /**
+     * 查询执行单列表
+     * @param request 查询请求VO
+     * @return 执行单列表
+     */
+    public Page<ForeignExchangeExecuteResponseVO> queryExecuteOrderList(ForeignExchangeExecuteQueryRequestVO request) {
+        ForeignExchangeOrder executeOrder = ForeignExchangeExecuteConverter.foreignExchangeExecuteQueryRequestVOToPO(request);
+        // 调用领域服务查询执行单列表
+        Page<ForeignExchangeOrder> orderPage = foreignExchangeExecuteDomainService.queryExecuteOrderList(executeOrder, request.getPage(), request.getSize());
+
+        // 转换为响应VO
+        List<ForeignExchangeExecuteResponseVO> responseVOs = orderPage.getRecords().stream()
+                .map(this::convertToResponseVO)
+                .collect(Collectors.toList());
+
+        // 构建响应分页对象
+        Page<ForeignExchangeExecuteResponseVO> responsePage = new Page<>();
+        responsePage.setRecords(responseVOs);
+        responsePage.setTotal(orderPage.getTotal());
+        responsePage.setCurrent(orderPage.getCurrent());
+        responsePage.setSize(orderPage.getSize());
+        responsePage.setPages(orderPage.getPages());
+
+        return responsePage;
+    }
+
+    /**
+     * 将ForeignExchangeOrder转换为ForeignExchangeExecuteResponseVO
+     */
+    private ForeignExchangeExecuteResponseVO convertToResponseVO(ForeignExchangeOrder order) {
+        ForeignExchangeExecuteResponseVO vo = new ForeignExchangeExecuteResponseVO();
+        vo.setId(order.getId());
+        vo.setOrderNo(order.getOrderNo());
+        vo.setApplyNo(order.getApplyNo());
+        vo.setCurrency(order.getCurrency());
+        vo.setAmount(order.getAmount());
+        vo.setRmbAmount(order.getRmbAmount());
+        vo.setRate(order.getRate());
+        vo.setTransactionSubject(order.getTransactionSubject());
+        vo.setSubjectAccountNo(order.getSubjectAccountNo());
+        vo.setCounterparty(order.getCounterparty());
+        vo.setCounterpartyAccountNo(order.getCounterpartyAccountNo());
+        vo.setSwiftBic(order.getSwiftBic());
+        vo.setStatus(order.getStatus());
+        vo.setUserId(order.getUserId());
+        vo.setCreateTime(order.getCreateTime());
+        return vo;
     }
 }

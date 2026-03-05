@@ -3,10 +3,14 @@ package com.example.foreign.exchange.application.converter;
 import com.example.foreign.exchange.application.entity.ForeignExchangeApplyEditRequestVO;
 import com.example.foreign.exchange.application.entity.ForeignExchangeApplyRequestVO;
 import com.example.foreign.exchange.application.entity.ForeignExchangeApplyResponseVO;
+import com.example.foreign.exchange.common.entity.Page;
 import com.example.foreign.exchange.domain.aggregate.ForeignExchangeApplyAggregate;
 import com.example.foreign.exchange.domain.entity.ForeignExchangeApply;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 外汇申请转换器
@@ -136,5 +140,53 @@ public class ForeignExchangeApplyConverter {
 
         // 4. 返回转换后的实体
         return foreignExchangeApply;
+    }
+
+    public static Page<ForeignExchangeApplyResponseVO> foreignExchangeApplyPageToResponseVO(Page<ForeignExchangeApply> page) {
+        Page<ForeignExchangeApplyResponseVO> responsePage = new Page<>();
+        responsePage.setTotal(page.getTotal());
+        responsePage.setCurrent(page.getCurrent());
+        responsePage.setSize(page.getSize());
+        responsePage.setPages(page.getPages());
+
+        // 转换每条记录
+        List<ForeignExchangeApplyResponseVO> responseList = new ArrayList<>();
+        for (ForeignExchangeApply apply : page.getRecords()) {
+            ForeignExchangeApplyResponseVO vo = new ForeignExchangeApplyResponseVO();
+            vo.setId(apply.getId());
+            vo.setApplyNo(apply.getApplyNo());
+            vo.setUserId(apply.getUserId());
+            vo.setDirection(apply.getDirection());
+            vo.setCurrency(apply.getCurrency());
+            vo.setAmount(apply.getAmount());
+            vo.setRate(apply.getRate());
+            vo.setRmbAmount(apply.getRmbAmount());
+            vo.setTransactionSubject(apply.getTransactionSubject());
+            vo.setSubjectAccountNo(apply.getSubjectAccountNo());
+            vo.setPurpose(apply.getPurpose());
+            vo.setCounterparty(apply.getCounterparty());
+            vo.setCounterpartyAccountNo(apply.getCounterpartyAccountNo());
+            vo.setSwiftBic(apply.getSwiftBic());
+
+            // 将 JSON 字符串转换为 List
+            try {
+                if (apply.getAttachPaths() != null) {
+                    com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                    java.util.List<String> attachPaths = objectMapper.readValue(apply.getAttachPaths(), java.util.List.class);
+                    vo.setAttachPaths(attachPaths);
+                }
+            } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+                throw new RuntimeException("Failed to convert attachPaths from JSON", e);
+            }
+
+            vo.setStatus(apply.getStatus());
+            vo.setSubmitTime(apply.getSubmitTime());
+            vo.setCreateTime(apply.getCreateTime());
+            vo.setIsDraft(apply.getIsDraft());
+
+            responseList.add(vo);
+        }
+        responsePage.setRecords(responseList);
+        return responsePage;
     }
 }

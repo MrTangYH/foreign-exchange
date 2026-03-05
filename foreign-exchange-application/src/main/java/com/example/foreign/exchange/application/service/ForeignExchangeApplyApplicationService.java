@@ -7,7 +7,7 @@ import com.example.foreign.exchange.application.entity.ForeignExchangeApplyRespo
 import com.example.foreign.exchange.common.entity.Page;
 import com.example.foreign.exchange.domain.aggregate.ForeignExchangeApplyAggregate;
 import com.example.foreign.exchange.domain.entity.ForeignExchangeApply;
-import com.example.foreign.exchange.domain.repo.ForeignExchangeApplyRepository;
+import com.example.foreign.exchange.domain.repository.ForeignExchangeApplyRepository;
 import com.example.foreign.exchange.common.redis.RedisIdGenerator;
 import com.example.foreign.exchange.domain.service.ForeignExchangeApplyDomainService;
 import jakarta.annotation.Resource;

@@ -1,4 +1,4 @@
-package com.example.foreign.exchange.domain.repo;
+package com.example.foreign.exchange.domain.repository;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.example.foreign.exchange.domain.entity.ForeignExchangeApply;

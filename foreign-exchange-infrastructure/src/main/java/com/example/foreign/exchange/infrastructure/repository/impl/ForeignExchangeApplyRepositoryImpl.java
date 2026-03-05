@@ -1,8 +1,6 @@
 package com.example.foreign.exchange.infrastructure.repository.impl;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.example.foreign.exchange.domain.entity.ForeignExchangeApply;
-import com.example.foreign.exchange.domain.repo.ForeignExchangeApplyRepository;
+import com.example.foreign.exchange.domain.repository.ForeignExchangeApplyRepository;
 import org.springframework.stereotype.Repository;
 
 /**

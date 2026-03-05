@@ -8,7 +8,7 @@ import com.example.foreign.exchange.domain.aggregate.ForeignExchangeApplyAggrega
 import com.example.foreign.exchange.domain.entity.ForeignExchangeApply;
 import com.example.foreign.exchange.domain.enums.ApplyStatusEnum;
 import com.example.foreign.exchange.domain.enums.DraftStatusEnum;
-import com.example.foreign.exchange.domain.repo.ForeignExchangeApplyRepository;
+import com.example.foreign.exchange.domain.repository.ForeignExchangeApplyRepository;
 import com.example.foreign.exchange.domain.service.ForeignExchangeApplyDomainService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;

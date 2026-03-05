@@ -1,0 +1,83 @@
+package com.example.foreign.exchange.controller.api;
+
+import com.example.foreign.exchange.application.entity.ForeignExchangePaymentQueryRequestVO;
+import com.example.foreign.exchange.application.entity.ForeignExchangePaymentRequestVO;
+import com.example.foreign.exchange.application.entity.ForeignExchangePaymentResponseVO;
+import com.example.foreign.exchange.application.service.ForeignExchangePaymentApplicationService;
+import com.example.foreign.exchange.common.entity.Page;
+import com.example.foreign.exchange.controller.dto.ApiResponseDTO;
+import com.example.foreign.exchange.controller.dto.ForeignExchangePaymentQueryRequestDTO;
+import com.example.foreign.exchange.controller.dto.ForeignExchangePaymentRequestDTO;
+import com.example.foreign.exchange.controller.converter.ForeignExchangePaymentConverter;
+import com.example.foreign.exchange.controller.dto.ForeignExchangePaymentResponseDTO;
+import jakarta.annotation.Resource;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * 外汇付款控制器
+ */
+@RestController
+@RequestMapping("/pay")
+public class ForeignExchangePaymentController {
+    
+    @Resource
+    private ForeignExchangePaymentApplicationService foreignExchangePaymentApplicationService;
+    
+    /**
+     * 生成付款单
+     */
+    @PostMapping("/submit")
+    public ApiResponseDTO submitPaymentOrder(@RequestBody ForeignExchangePaymentRequestDTO dto) {
+        try {
+            // 转换DTO为VO
+            ForeignExchangePaymentRequestVO vo = ForeignExchangePaymentConverter.foreignExchangePaymentRequestDTO2VO(dto);
+            // 调用应用服务生成付款单
+            String result = foreignExchangePaymentApplicationService.submitPaymentOrder(vo);
+            // 返回结果
+            return ApiResponseDTO.success("生成付款单成功", result);
+        } catch (Exception e) {
+            return ApiResponseDTO.fail(500, "生成付款单失败：" + e.getMessage());
+        }
+    }
+    
+    /**
+     * 查询付款单列表
+     */
+    @PostMapping("/query_list")
+    public ApiResponseDTO queryPaymentOrderList(@RequestBody ForeignExchangePaymentQueryRequestDTO dto) {
+        try {
+            // 转换DTO为VO
+            ForeignExchangePaymentQueryRequestVO vo = ForeignExchangePaymentConverter.foreignExchangePaymentQueryRequestDTO2VO(dto);
+            // 调用应用服务查询付款单列表
+            Page<ForeignExchangePaymentResponseVO> result = foreignExchangePaymentApplicationService.queryPaymentOrderList(vo);
+            Page<ForeignExchangePaymentResponseDTO> dtoPage = ForeignExchangePaymentConverter.foreignExchangePaymentResponseVOPage2DTOPage(result);
+            // 返回结果
+            return ApiResponseDTO.success("查询成功", dtoPage);
+        } catch (Exception e) {
+            return ApiResponseDTO.fail(500, "查询付款单列表失败：" + e.getMessage());
+        }
+    }
+
+    @PostMapping("/query_by_payment_no")
+    public ApiResponseDTO queryByPaymentNo(@RequestBody ForeignExchangePaymentQueryRequestDTO dto) {
+        try {
+            // 转换DTO为VO
+            ForeignExchangePaymentQueryRequestVO vo = ForeignExchangePaymentConverter.foreignExchangePaymentQueryRequestDTO2VO(dto);
+            // 调用应用服务查询付款单列表
+            Page<ForeignExchangePaymentResponseVO> result = foreignExchangePaymentApplicationService.queryPaymentOrderList(vo);
+            if (result != null && !CollectionUtils.isEmpty(result.getRecords())) {
+                ForeignExchangePaymentResponseDTO responseDto = ForeignExchangePaymentConverter.foreignExchangePaymentResponseVO2DTO(result.getRecords().get(0));
+                return ApiResponseDTO.success("查询成功", responseDto);
+            }
+            // 返回结果
+            return ApiResponseDTO.success("查询失败", null);
+        } catch (Exception e) {
+            return ApiResponseDTO.fail(500, "查询付款单详情失败：" + e.getMessage());
+        }
+    }
+
+}

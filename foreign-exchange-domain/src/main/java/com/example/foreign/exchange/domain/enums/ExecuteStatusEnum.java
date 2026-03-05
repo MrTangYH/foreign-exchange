@@ -9,7 +9,7 @@ import lombok.Getter;
 public enum ExecuteStatusEnum {
 
     GENERATED(1, "执行单已生成"),
-    PAYMENT_GENERATED(2, "执行单已生成付款单"),
+    PAYMENT_GENERATED(2, "付款单已生成"),
     CANCELLED(3, "执行单已取消"),
     VOIDED(4, "执行单已作废");
 

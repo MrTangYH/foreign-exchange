@@ -42,8 +42,8 @@ public class RedisIdGenerator {
 
     /**
      * 生成外汇交易执行编号
-     * 格式：FXAPPLY+YYYYMMDD+6位序列
-     * @return 申请编号
+     * 格式：FXORDER+YYYYMMDD+6位序列
+     * @return 执行编号
      */
     public String generateOrderNo() {
         String dateStr = LocalDate.now().format(DATE_FORMATTER);
@@ -59,5 +59,26 @@ public class RedisIdGenerator {
         String sequenceStr = String.format("%06d", sequence);
 
         return "FXORDER" + dateStr + sequenceStr;
+    }
+    
+    /**
+     * 生成付款单号
+     * 格式：FXPAYMENT+YYYYMMDD+8位序列
+     * @return 付款单号
+     */
+    public String generatePaymentNo() {
+        String dateStr = LocalDate.now().format(DATE_FORMATTER);
+        String key = "foreign_exchange:payment_no:" + dateStr;
+
+        // 使用Redis自增生成8位序列
+        Long sequence = redisTemplate.opsForValue().increment(key);
+
+        // 设置过期时间为2天，确保键不会永久存在
+        redisTemplate.expire(key, 2, java.util.concurrent.TimeUnit.DAYS);
+
+        // 格式化为8位，不足前面补0
+        String sequenceStr = String.format("%06d", sequence);
+
+        return "FXPAYMENT" + dateStr + sequenceStr;
     }
 }

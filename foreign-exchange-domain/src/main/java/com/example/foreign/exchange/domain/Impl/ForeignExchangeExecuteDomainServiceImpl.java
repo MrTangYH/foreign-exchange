@@ -45,6 +45,9 @@ public class ForeignExchangeExecuteDomainServiceImpl implements ForeignExchangeE
             if (execute.getApplyNo() != null && !execute.getApplyNo().isEmpty()) {
                 queryWrapper.eq("apply_no", execute.getApplyNo());
             }
+            if (execute.getDirection() != null) {
+                queryWrapper.eq("direction", execute.getDirection());
+            }
             if (execute.getCurrency() != null && !execute.getCurrency().isEmpty()) {
                 queryWrapper.eq("currency", execute.getCurrency());
             }

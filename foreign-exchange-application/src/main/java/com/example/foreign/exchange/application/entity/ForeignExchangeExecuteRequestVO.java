@@ -14,6 +14,11 @@ public class ForeignExchangeExecuteRequestVO {
     private String applyNo;
     
     /**
+     * 交易方向（1-购汇，2-结汇）
+     */
+    private Integer direction;
+    
+    /**
      * 交易币种
      */
     private String currency;

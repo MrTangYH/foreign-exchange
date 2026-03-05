@@ -36,7 +36,12 @@ public class ForeignExchangeOrder {
      * 外币金额
      */
     private BigDecimal amount;
-    
+
+    /**
+     * 1 -购汇 2-结汇
+     */
+    private Integer direction;
+
     /**
      * 本币金额（来自申请快照）
      */

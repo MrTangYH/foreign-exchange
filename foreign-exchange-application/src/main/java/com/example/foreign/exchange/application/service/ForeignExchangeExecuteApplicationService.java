@@ -51,11 +51,10 @@ public class ForeignExchangeExecuteApplicationService {
         order.setSwiftBic(request.getSwiftBic());
         order.setStatus(ExecuteStatusEnum.GENERATED.getCode());
         order.setUserId(request.getUserId());
+        order.setDirection(request.getDirection());
         
         // 调用领域服务保存执行单
-        foreignExchangeExecuteDomainService.saveExecuteOrder(order);
-        
-        return "生成教育执行单成功";
+        return foreignExchangeExecuteDomainService.saveExecuteOrder(order);
     }
 
     /**
@@ -92,6 +91,7 @@ public class ForeignExchangeExecuteApplicationService {
         vo.setId(order.getId());
         vo.setOrderNo(order.getOrderNo());
         vo.setApplyNo(order.getApplyNo());
+        vo.setDirection(order.getDirection());
         vo.setCurrency(order.getCurrency());
         vo.setAmount(order.getAmount());
         vo.setRmbAmount(order.getRmbAmount());

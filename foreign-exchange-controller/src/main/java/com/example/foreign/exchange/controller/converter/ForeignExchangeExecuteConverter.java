@@ -26,6 +26,7 @@ public class ForeignExchangeExecuteConverter {
         
         ForeignExchangeExecuteRequestVO vo = new ForeignExchangeExecuteRequestVO();
         vo.setApplyNo(dto.getApplyNo());
+        vo.setDirection(dto.getDirection());
         vo.setCurrency(dto.getCurrency());
         vo.setAmount(dto.getAmount());
         vo.setRmbAmount(dto.getRmbAmount());
@@ -40,7 +41,7 @@ public class ForeignExchangeExecuteConverter {
         
         return vo;
     }
-
+    
     /**
      * 将ForeignExchangeExecuteQueryRequestDTO转换为ForeignExchangeExecuteQueryRequestVO
      */
@@ -48,10 +49,11 @@ public class ForeignExchangeExecuteConverter {
         if (dto == null) {
             return null;
         }
-
+        
         ForeignExchangeExecuteQueryRequestVO vo = new ForeignExchangeExecuteQueryRequestVO();
         vo.setOrderNo(dto.getOrderNo());
         vo.setApplyNo(dto.getApplyNo());
+        vo.setDirection(dto.getDirection());
         vo.setCurrency(dto.getCurrency());
         vo.setAmount(dto.getAmount());
         vo.setRmbAmount(dto.getRmbAmount());
@@ -65,10 +67,10 @@ public class ForeignExchangeExecuteConverter {
         vo.setUserId(dto.getUserId());
         vo.setPage(dto.getPage());
         vo.setSize(dto.getSize());
-
+        
         return vo;
     }
-
+    
     /**
      * 将ForeignExchangeExecuteResponseVO转换为ForeignExchangeExecuteResponseDTO
      */
@@ -76,11 +78,12 @@ public class ForeignExchangeExecuteConverter {
         if (vo == null) {
             return null;
         }
-
+        
         ForeignExchangeExecuteResponseDTO dto = new ForeignExchangeExecuteResponseDTO();
         dto.setId(vo.getId());
         dto.setOrderNo(vo.getOrderNo());
         dto.setApplyNo(vo.getApplyNo());
+        dto.setDirection(vo.getDirection());
         dto.setCurrency(vo.getCurrency());
         dto.setAmount(vo.getAmount());
         dto.setRmbAmount(vo.getRmbAmount());
@@ -93,7 +96,7 @@ public class ForeignExchangeExecuteConverter {
         dto.setStatus(vo.getStatus());
         dto.setUserId(vo.getUserId());
         dto.setCreateTime(vo.getCreateTime());
-
+        
         return dto;
     }
 

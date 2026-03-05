@@ -19,6 +19,7 @@ public class ForeignExchangeExecuteConverter {
         
         ForeignExchangeOrder execute = new ForeignExchangeOrder();
         execute.setApplyNo(vo.getApplyNo());
+        execute.setDirection(vo.getDirection());
         execute.setCurrency(vo.getCurrency());
         execute.setAmount(vo.getAmount());
         execute.setRmbAmount(vo.getRmbAmount());
@@ -45,6 +46,7 @@ public class ForeignExchangeExecuteConverter {
         ForeignExchangeOrder execute = new ForeignExchangeOrder();
         execute.setOrderNo(vo.getOrderNo());
         execute.setApplyNo(vo.getApplyNo());
+        execute.setDirection(vo.getDirection());
         execute.setCurrency(vo.getCurrency());
         execute.setAmount(vo.getAmount());
         execute.setRmbAmount(vo.getRmbAmount());

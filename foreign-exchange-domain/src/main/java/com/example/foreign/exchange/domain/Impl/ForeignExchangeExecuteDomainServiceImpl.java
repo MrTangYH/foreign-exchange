@@ -75,4 +75,22 @@ public class ForeignExchangeExecuteDomainServiceImpl implements ForeignExchangeE
 
         return commonPage;
     }
+
+    @Override
+    public boolean updateOrderStatus(String orderNo, Integer status) {
+        // 构建查询条件
+        QueryWrapper<ForeignExchangeOrder> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("order_no", orderNo);
+        
+        // 构建更新对象
+        ForeignExchangeOrder order = new ForeignExchangeOrder();
+        order.setStatus(status);
+        order.setUpdateTime(LocalDateTime.now());
+        
+        // 执行更新
+        int result = foreignExchangeOrderRepository.update(order, queryWrapper);
+        
+        // 返回是否更新成功
+        return result > 0;
+    }
 }

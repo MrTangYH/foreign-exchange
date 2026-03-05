@@ -7,8 +7,10 @@ import com.example.foreign.exchange.application.entity.ForeignExchangePaymentRes
 import com.example.foreign.exchange.common.entity.Page;
 import com.example.foreign.exchange.common.redis.RedisIdGenerator;
 import com.example.foreign.exchange.domain.entity.ForeignExchangePayment;
+import com.example.foreign.exchange.domain.enums.ExecuteStatusEnum;
 import com.example.foreign.exchange.domain.query.ForeignExchangePaymentQuery;
 import com.example.foreign.exchange.domain.service.ForeignExchangePaymentDomainService;
+import com.example.foreign.exchange.domain.service.ForeignExchangeExecuteDomainService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -25,6 +27,9 @@ public class ForeignExchangePaymentApplicationService {
     
     @Resource
     private ForeignExchangePaymentDomainService foreignExchangePaymentDomainService;
+    
+    @Resource
+    private ForeignExchangeExecuteDomainService foreignExchangeExecuteDomainService;
     
     /**
      * 生成付款单
@@ -55,7 +60,10 @@ public class ForeignExchangePaymentApplicationService {
         // 调用领域服务保存付款单
         foreignExchangePaymentDomainService.savePaymentOrder(payment);
         
-        return "生成付款单成功";
+        // 更新执行单状态为付款单已生成（状态码2）
+        foreignExchangeExecuteDomainService.updateOrderStatus(request.getOrderNo(), ExecuteStatusEnum.PAYMENT_GENERATED.getCode());
+        
+        return paymentNo;
     }
     
     /**

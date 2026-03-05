@@ -23,4 +23,12 @@ public interface ForeignExchangeExecuteDomainService {
      */
     Page<ForeignExchangeOrder> queryExecuteOrderList(ForeignExchangeOrder execute, Long page, Long size);
 
+    /**
+     * 更新执行单状态
+     * @param orderNo 执行单号
+     * @param status 状态
+     * @return 是否更新成功
+     */
+    boolean updateOrderStatus(String orderNo, Integer status);
+
 }

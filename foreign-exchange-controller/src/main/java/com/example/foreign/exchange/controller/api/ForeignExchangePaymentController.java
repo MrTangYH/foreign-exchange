@@ -1,15 +1,16 @@
 package com.example.foreign.exchange.controller.api;
 
+import com.example.foreign.exchange.application.entity.*;
 import com.example.foreign.exchange.application.entity.ForeignExchangePaymentQueryRequestVO;
-import com.example.foreign.exchange.application.entity.ForeignExchangePaymentRequestVO;
-import com.example.foreign.exchange.application.entity.ForeignExchangePaymentResponseVO;
 import com.example.foreign.exchange.application.service.ForeignExchangePaymentApplicationService;
 import com.example.foreign.exchange.common.entity.Page;
 import com.example.foreign.exchange.controller.dto.ApiResponseDTO;
 import com.example.foreign.exchange.controller.dto.ForeignExchangePaymentQueryRequestDTO;
 import com.example.foreign.exchange.controller.dto.ForeignExchangePaymentRequestDTO;
+import com.example.foreign.exchange.controller.dto.ForeignExchangePaymentStatusRequestDTO;
 import com.example.foreign.exchange.controller.converter.ForeignExchangePaymentConverter;
 import com.example.foreign.exchange.controller.dto.ForeignExchangePaymentResponseDTO;
+import com.example.foreign.exchange.domain.enums.PaymentStatusResultEnum;
 import jakarta.annotation.Resource;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -53,12 +54,37 @@ public class ForeignExchangePaymentController {
             // 转换DTO为VO
             ForeignExchangePaymentQueryRequestVO vo = ForeignExchangePaymentConverter.foreignExchangePaymentQueryRequestDTO2VO(dto);
             // 调用应用服务查询付款单列表
-            Page<ForeignExchangePaymentResponseVO> result = foreignExchangePaymentApplicationService.queryPaymentOrderList(vo);
-            Page<ForeignExchangePaymentResponseDTO> dtoPage = ForeignExchangePaymentConverter.foreignExchangePaymentResponseVOPage2DTOPage(result);
+            var result = foreignExchangePaymentApplicationService.queryPaymentOrderList(vo);
+            // 转换为响应DTO
+            var responsePage = ForeignExchangePaymentConverter.foreignExchangePaymentResponseVOPage2DTOPage(result);
             // 返回结果
-            return ApiResponseDTO.success("查询成功", dtoPage);
+            return ApiResponseDTO.success("查询成功", responsePage);
         } catch (Exception e) {
             return ApiResponseDTO.fail(500, "查询付款单列表失败：" + e.getMessage());
+        }
+    }
+    
+    /**
+     * 处理支付状态变更
+     */
+    @PostMapping("/change_status")
+    public ApiResponseDTO changePaymentStatus(@RequestBody ForeignExchangePaymentStatusRequestDTO dto) {
+        try {
+            // 转换DTO为VO
+            ForeignExchangePaymentStatusRequestVO vo = ForeignExchangePaymentConverter.foreignExchangePaymentStatusRequestDTO2VO(dto);
+            // 调用应用服务处理支付状态变更
+            PaymentStatusResultEnum result = foreignExchangePaymentApplicationService.handlePaymentStatusChange(vo);
+
+            // 返回结果
+            if (result.getCode() == PaymentStatusResultEnum.PAYMENT_SUCCESS.getCode()) {
+                // 付款成功
+                return ApiResponseDTO.success(PaymentStatusResultEnum.PAYMENT_SUCCESS.getMessage(), dto.getPaymentNo());
+            } else {
+                // 操作失败，返回失败响应
+                return ApiResponseDTO.fail(400, result.getMessage());
+            }
+        } catch (Exception e) {
+            return ApiResponseDTO.fail(500, "处理支付状态变更失败：" + e.getMessage());
         }
     }
 

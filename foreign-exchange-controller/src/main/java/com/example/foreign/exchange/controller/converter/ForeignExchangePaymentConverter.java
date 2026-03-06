@@ -3,10 +3,12 @@ package com.example.foreign.exchange.controller.converter;
 import com.example.foreign.exchange.application.entity.ForeignExchangePaymentQueryRequestVO;
 import com.example.foreign.exchange.application.entity.ForeignExchangePaymentRequestVO;
 import com.example.foreign.exchange.application.entity.ForeignExchangePaymentResponseVO;
+import com.example.foreign.exchange.application.entity.ForeignExchangePaymentStatusRequestVO;
 import com.example.foreign.exchange.common.entity.Page;
 import com.example.foreign.exchange.controller.dto.ForeignExchangePaymentQueryRequestDTO;
 import com.example.foreign.exchange.controller.dto.ForeignExchangePaymentRequestDTO;
 import com.example.foreign.exchange.controller.dto.ForeignExchangePaymentResponseDTO;
+import com.example.foreign.exchange.controller.dto.ForeignExchangePaymentStatusRequestDTO;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -124,5 +126,23 @@ public class ForeignExchangePaymentConverter {
         dtoPage.setCurrent(voPage.getCurrent());
         
         return dtoPage;
+    }
+    
+    /**
+     * 将ForeignExchangePaymentStatusRequestDTO转换为ForeignExchangePaymentStatusRequestVO
+     */
+    public static ForeignExchangePaymentStatusRequestVO foreignExchangePaymentStatusRequestDTO2VO(ForeignExchangePaymentStatusRequestDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+        
+        ForeignExchangePaymentStatusRequestVO vo = new ForeignExchangePaymentStatusRequestVO();
+        vo.setPaymentNo(dto.getPaymentNo());
+        vo.setSubjectAccountNo(dto.getSubjectAccountNo());
+        vo.setPayCurrency(dto.getPayCurrency());
+        vo.setPaymentAmount(dto.getPaymentAmount());
+        vo.setStatus(dto.getStatus());
+        
+        return vo;
     }
 }

@@ -4,13 +4,15 @@ import com.example.foreign.exchange.application.converter.ForeignExchangePayment
 import com.example.foreign.exchange.application.entity.ForeignExchangePaymentQueryRequestVO;
 import com.example.foreign.exchange.application.entity.ForeignExchangePaymentRequestVO;
 import com.example.foreign.exchange.application.entity.ForeignExchangePaymentResponseVO;
+import com.example.foreign.exchange.application.entity.ForeignExchangePaymentStatusRequestVO;
 import com.example.foreign.exchange.common.entity.Page;
 import com.example.foreign.exchange.common.redis.RedisIdGenerator;
 import com.example.foreign.exchange.domain.entity.ForeignExchangePayment;
 import com.example.foreign.exchange.domain.enums.ExecuteStatusEnum;
+import com.example.foreign.exchange.domain.enums.PaymentStatusResultEnum;
 import com.example.foreign.exchange.domain.query.ForeignExchangePaymentQuery;
-import com.example.foreign.exchange.domain.service.ForeignExchangePaymentDomainService;
 import com.example.foreign.exchange.domain.service.ForeignExchangeExecuteDomainService;
+import com.example.foreign.exchange.domain.service.ForeignExchangePaymentDomainService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -51,7 +53,7 @@ public class ForeignExchangePaymentApplicationService {
         payment.setSubjectAccountNo(request.getSubjectAccountNo());
         payment.setCounterpartyAccountNo(request.getCounterpartyAccountNo());
         payment.setSwiftBic(request.getSwiftBic());
-        payment.setStatus(request.getStatus());
+        payment.setStatus(PaymentStatusResultEnum.PENDING_PAYMENT.getCode());
         payment.setPaymentTime(request.getPaymentTime());
         payment.setFailureReason(request.getFailureReason());
         payment.setUserId(request.getUserId());
@@ -92,6 +94,23 @@ public class ForeignExchangePaymentApplicationService {
         responsePage.setCurrent(paymentPage.getCurrent());
         
         return responsePage;
+    }
+    
+    /**
+     * 处理支付状态变更
+     * @param request 支付状态变更请求VO
+     * @return 支付状态结果
+     */
+    public PaymentStatusResultEnum handlePaymentStatusChange(ForeignExchangePaymentStatusRequestVO request) {
+        // 调用领域服务处理支付状态变更
+        PaymentStatusResultEnum result = foreignExchangePaymentDomainService.handlePaymentStatusChange(
+                request.getPaymentNo(),
+                request.getSubjectAccountNo(),
+                request.getPayCurrency(),
+                request.getPaymentAmount()
+        );
+        
+        return result;
     }
     
     /**

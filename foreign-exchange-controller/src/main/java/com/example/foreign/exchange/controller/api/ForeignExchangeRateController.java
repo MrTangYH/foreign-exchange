@@ -25,8 +25,8 @@ public class ForeignExchangeRateController {
      * 每3小时调用外部接口获取汇率，并保存到Redis
      * 返回当前汇率数据给前端
      */
-    @GetMapping("/real_time_exchange_rate")
-    public ApiResponseDTO getRealTimeExchangeRate() {
+    @GetMapping("/query_real_time_exchange_rate")
+    public ApiResponseDTO queryRealTimeExchangeRate() {
         try {
             // 调用服务获取实时汇率
             List<Map<String, Object>> exchangeRates = exchangeRateService.getRealTimeExchangeRate();

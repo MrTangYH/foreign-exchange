@@ -6,11 +6,13 @@ import com.example.foreign.exchange.common.entity.Page;
 import com.example.foreign.exchange.domain.entity.ForeignExchangeAccount;
 import com.example.foreign.exchange.domain.entity.ForeignExchangeAccountTransaction;
 import com.example.foreign.exchange.domain.entity.ForeignExchangePayment;
+import com.example.foreign.exchange.domain.enums.ExecuteStatusEnum;
 import com.example.foreign.exchange.domain.enums.PaymentStatusResultEnum;
 import com.example.foreign.exchange.domain.query.ForeignExchangePaymentQuery;
 import com.example.foreign.exchange.domain.repository.ForeignExchangeAccountRepository;
 import com.example.foreign.exchange.domain.repository.ForeignExchangeAccountTransactionRepository;
 import com.example.foreign.exchange.domain.repository.ForeignExchangePaymentRepository;
+import com.example.foreign.exchange.domain.service.ForeignExchangeExecuteDomainService;
 import com.example.foreign.exchange.domain.service.ForeignExchangePaymentDomainService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,9 @@ public class ForeignExchangePaymentDomainServiceImpl implements ForeignExchangeP
     
     @Resource
     private ForeignExchangeAccountTransactionRepository foreignExchangeAccountTransactionRepository;
+    
+    @Resource
+    private ForeignExchangeExecuteDomainService foreignExchangeExecuteDomainService;
     
     @Override
     public String savePaymentOrder(ForeignExchangePayment payment) {
@@ -86,6 +91,7 @@ public class ForeignExchangePaymentDomainServiceImpl implements ForeignExchangeP
         commonPage.setTotal(resultPage.getTotal());
         commonPage.setPages(resultPage.getCurrent());
         commonPage.setSize(resultPage.getSize());
+        commonPage.setCurrent(resultPage.getCurrent());
         
         return commonPage;
     }
@@ -161,5 +167,37 @@ public class ForeignExchangePaymentDomainServiceImpl implements ForeignExchangeP
                 PaymentStatusResultEnum.PAYMENT_SUCCESS.getMessage());
         
         return PaymentStatusResultEnum.PAYMENT_SUCCESS;
+    }
+    
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public String cancelPayment(String paymentNo) {
+        // 1. 查询付款单信息
+        QueryWrapper<ForeignExchangePayment> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("payment_no", paymentNo);
+        ForeignExchangePayment payment = foreignExchangePaymentRepository.selectOne(queryWrapper);
+        
+        // 2. 校验付款单是否存在
+        if (payment == null) {
+            return "付款单不存在";
+        }
+        
+        // 3. 校验付款单状态，当且仅当status != 1时方能取消付款单
+        if (payment.getStatus() == PaymentStatusResultEnum.PAYMENT_SUCCESS.getCode()) {
+//            throw new RuntimeException("当前付款单状态为付款成功，无法取消");
+            return "当前付款单状态为付款成功，无法取消";
+        }
+        
+        // 4. 更新付款单状态为4（已作废）
+        payment.setStatus(PaymentStatusResultEnum.CANCEL_PAYMENT.getCode());
+        foreignExchangePaymentRepository.updateById(payment);
+        
+        // 5. 同步回退执行单状态为1（执行单已生成）
+        if (payment.getOrderNo() != null) {
+            foreignExchangeExecuteDomainService.updateOrderStatus(payment.getOrderNo(), ExecuteStatusEnum.GENERATED.getCode());
+        }
+        
+        // 6. 返回付款单号
+        return paymentNo;
     }
 }

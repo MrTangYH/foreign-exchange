@@ -54,7 +54,7 @@ public class ForeignExchangePaymentController {
             // 转换DTO为VO
             ForeignExchangePaymentQueryRequestVO vo = ForeignExchangePaymentConverter.foreignExchangePaymentQueryRequestDTO2VO(dto);
             // 调用应用服务查询付款单列表
-            var result = foreignExchangePaymentApplicationService.queryPaymentOrderList(vo);
+            Page<ForeignExchangePaymentResponseVO> result = foreignExchangePaymentApplicationService.queryPaymentOrderList(vo);
             // 转换为响应DTO
             var responsePage = ForeignExchangePaymentConverter.foreignExchangePaymentResponseVOPage2DTOPage(result);
             // 返回结果
@@ -85,6 +85,26 @@ public class ForeignExchangePaymentController {
             }
         } catch (Exception e) {
             return ApiResponseDTO.fail(500, "处理支付状态变更失败：" + e.getMessage());
+        }
+    }
+    
+    /**
+     * 取消付款单
+     */
+    @PostMapping("/cancel")
+    public ApiResponseDTO cancelPayment(@RequestBody ForeignExchangePaymentStatusRequestDTO dto) {
+        try {
+            // 转换DTO为VO
+            ForeignExchangePaymentStatusRequestVO vo = ForeignExchangePaymentConverter.foreignExchangePaymentStatusRequestDTO2VO(dto);
+            // 调用应用服务取消付款单
+            String result = foreignExchangePaymentApplicationService.cancelPayment(vo);
+            // 返回结果
+            if (result.equals(dto.getPaymentNo())) {
+                return ApiResponseDTO.success("取消付款成功", result);
+            }
+            return ApiResponseDTO.fail(400, result);
+        } catch (Exception e) {
+            return ApiResponseDTO.fail(500, "取消付款单失败：" + e.getMessage());
         }
     }
 

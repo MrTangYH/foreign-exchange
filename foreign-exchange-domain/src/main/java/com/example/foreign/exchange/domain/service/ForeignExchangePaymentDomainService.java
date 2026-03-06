@@ -41,4 +41,11 @@ public interface ForeignExchangePaymentDomainService {
      * @return 支付状态结果枚举
      */
     PaymentStatusResultEnum handlePaymentStatusChange(String paymentNo, String subjectAccountNo, String payCurrency, java.math.BigDecimal paymentAmount);
+    
+    /**
+     * 取消付款单
+     * @param paymentNo 付款单号
+     * @return 付款单号
+     */
+    String cancelPayment(String paymentNo);
 }

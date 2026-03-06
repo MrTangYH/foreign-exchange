@@ -112,6 +112,16 @@ public class ForeignExchangePaymentApplicationService {
         
         return result;
     }
+
+    /**
+     * 取消付款单
+     * @param request 取消付款单请求VO
+     * @return 付款单号
+     */
+    public String cancelPayment(ForeignExchangePaymentStatusRequestVO request) {
+        // 调用领域服务取消付款单
+        return foreignExchangePaymentDomainService.cancelPayment(request.getPaymentNo());
+    }
     
     /**
      * 将ForeignExchangePayment转换为ForeignExchangePaymentResponseVO

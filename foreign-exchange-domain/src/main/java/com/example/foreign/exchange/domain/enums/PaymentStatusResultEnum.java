@@ -31,7 +31,7 @@ public enum PaymentStatusResultEnum {
     /**
      * 取消付款
      */
-    CANCEL_PAYMENT(4, "取消付款");
+    CANCEL_PAYMENT(4, "付款取消");
 
     private final Integer code;
     private final String message;

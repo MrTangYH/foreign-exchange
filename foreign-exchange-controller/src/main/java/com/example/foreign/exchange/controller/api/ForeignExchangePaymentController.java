@@ -4,19 +4,26 @@ import com.example.foreign.exchange.application.entity.*;
 import com.example.foreign.exchange.application.entity.ForeignExchangePaymentQueryRequestVO;
 import com.example.foreign.exchange.application.service.ForeignExchangePaymentApplicationService;
 import com.example.foreign.exchange.common.entity.Page;
+import com.example.foreign.exchange.common.util.EasyExcelUtil;
 import com.example.foreign.exchange.controller.dto.ApiResponseDTO;
 import com.example.foreign.exchange.controller.dto.ForeignExchangePaymentQueryRequestDTO;
 import com.example.foreign.exchange.controller.dto.ForeignExchangePaymentRequestDTO;
 import com.example.foreign.exchange.controller.dto.ForeignExchangePaymentStatusRequestDTO;
 import com.example.foreign.exchange.controller.converter.ForeignExchangePaymentConverter;
 import com.example.foreign.exchange.controller.dto.ForeignExchangePaymentResponseDTO;
+import com.example.foreign.exchange.controller.vo.ForeignExchangePaymentExcelVO;
 import com.example.foreign.exchange.domain.enums.PaymentStatusResultEnum;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 外汇付款控制器
@@ -123,6 +130,69 @@ public class ForeignExchangePaymentController {
             return ApiResponseDTO.success("查询失败", null);
         } catch (Exception e) {
             return ApiResponseDTO.fail(500, "查询付款单详情失败：" + e.getMessage());
+        }
+    }
+    
+    /**
+     * 导出付款单列表为Excel
+     */
+    @PostMapping("/export")
+    public void export(@RequestBody ForeignExchangePaymentQueryRequestDTO dto, HttpServletResponse response) {
+        try {
+            // 转换DTO为VO
+            ForeignExchangePaymentQueryRequestVO vo = ForeignExchangePaymentConverter.foreignExchangePaymentQueryRequestDTO2VO(dto);
+            // 设置分页参数，查询所有数据（上限10万条）
+            vo.setPage(1L);
+            vo.setSize(100000L);
+            // 调用应用服务查询付款单列表
+            Page<ForeignExchangePaymentResponseVO> result = foreignExchangePaymentApplicationService.queryPaymentOrderList(vo);
+            
+            // 转换为Excel VO列表
+            List<ForeignExchangePaymentExcelVO> excelVOList = new ArrayList<>();
+            for (ForeignExchangePaymentResponseVO payment : result.getRecords()) {
+                ForeignExchangePaymentExcelVO excelVO = new ForeignExchangePaymentExcelVO();
+                excelVO.setPaymentNo(payment.getPaymentNo());
+                excelVO.setExecuteNo(payment.getOrderNo());
+//                excelVO.setDirection(payment.get() == 1 ? "购汇" : "结汇");
+                excelVO.setCurrency(payment.getPayCurrency());
+                excelVO.setPaymentAmount(payment.getPaymentAmount());
+                excelVO.setSubjectAccountNo(payment.getSubjectAccountNo());
+                excelVO.setCounterpartyAccountNo(payment.getCounterpartyAccountNo());
+                excelVO.setPaymentTime(payment.getPaymentTime());
+                excelVO.setStatus(getStatusText(payment.getStatus()));
+                excelVO.setCreateTime(payment.getCreateTime());
+                excelVOList.add(excelVO);
+            }
+            
+            // 导出Excel
+            EasyExcelUtil.exportExcel(response, excelVOList, "外汇交易付款列表", ForeignExchangePaymentExcelVO.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            try {
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write("{\"code\": 500, \"message\": \"导出数据失败：\" + e.getMessage()}");
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+    
+    /**
+     * 获取状态文本
+     */
+    private String getStatusText(Integer status) {
+        switch (status) {
+            case 0:
+                return "待支付";
+            case 1:
+                return "付款成功";
+            case 2:
+                return "付款失败";
+            case 3:
+                return "已取消";
+            default:
+                return "未知";
         }
     }
 

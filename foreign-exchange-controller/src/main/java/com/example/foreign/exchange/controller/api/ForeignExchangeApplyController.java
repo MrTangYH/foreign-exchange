@@ -8,7 +8,7 @@ import com.example.foreign.exchange.common.entity.Page;
 import com.example.foreign.exchange.common.utils.EasyExcelUtil;
 import com.example.foreign.exchange.controller.converter.ForeignExchangeApplyConverter;
 import com.example.foreign.exchange.controller.dto.*;
-import com.example.foreign.exchange.controller.vo.ForeignExchangeApplyExcelVO;
+import com.example.foreign.exchange.application.entity.ForeignExchangeApplyExcelVO;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.util.CollectionUtils;
@@ -137,34 +137,8 @@ public class ForeignExchangeApplyController {
         try {
             // 转换DTO为VO
             ForeignExchangeApplyEditRequestVO vo = ForeignExchangeApplyConverter.foreignExchangeApplyEditRequestDTO2VO(dto);
-            // 设置分页参数，查询所有数据（上限10万条）
-            vo.setPage(1L);
-            vo.setSize(100000L);
-            // 调用应用服务查询申请列表
-            Page<ForeignExchangeApplyResponseVO> result = foreignExchangeApplyApplicationService.queryApplyList(vo);
-            
-            // 转换为Excel VO列表
-            List<ForeignExchangeApplyExcelVO> excelVOList = new ArrayList<>();
-            for (ForeignExchangeApplyResponseVO apply : result.getRecords()) {
-                ForeignExchangeApplyExcelVO excelVO = new ForeignExchangeApplyExcelVO();
-                excelVO.setApplyNo(apply.getApplyNo());
-                excelVO.setUserId(apply.getUserId());
-                excelVO.setDirection(apply.getDirection() == 1 ? "购汇" : "结汇");
-                excelVO.setCurrency(apply.getCurrency());
-                excelVO.setAmount(apply.getAmount());
-                excelVO.setRate(apply.getRate());
-                excelVO.setRmbAmount(apply.getRmbAmount());
-                excelVO.setTransactionSubject(apply.getTransactionSubject());
-                excelVO.setSubjectAccountNo(apply.getSubjectAccountNo());
-                excelVO.setPurpose(apply.getPurpose());
-                excelVO.setCounterparty(apply.getCounterparty());
-                excelVO.setCounterpartyAccountNo(apply.getCounterpartyAccountNo());
-                excelVO.setSwiftBic(apply.getSwiftBic());
-                excelVO.setStatus(getStatusText(apply.getStatus()));
-                excelVO.setSubmitTime(apply.getSubmitTime());
-                excelVO.setCreateTime(apply.getCreateTime());
-                excelVOList.add(excelVO);
-            }
+
+            List<ForeignExchangeApplyExcelVO> excelVOList = foreignExchangeApplyApplicationService.exportApplyList(vo);
             
             // 导出Excel
             EasyExcelUtil.exportExcel(response, excelVOList, "外汇申请列表", ForeignExchangeApplyExcelVO.class);
@@ -179,24 +153,5 @@ public class ForeignExchangeApplyController {
             }
         }
     }
-    
-    /**
-     * 获取状态文本
-     */
-    private String getStatusText(Integer status) {
-        switch (status) {
-            case 0:
-                return "草稿";
-            case 1:
-                return "待审核";
-            case 2:
-                return "已审核";
-            case 3:
-                return "已拒绝";
-            case 4:
-                return "已作废";
-            default:
-                return "未知";
-        }
-    }
+
 }

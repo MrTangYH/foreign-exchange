@@ -11,7 +11,7 @@ import com.example.foreign.exchange.controller.dto.ForeignExchangePaymentRequest
 import com.example.foreign.exchange.controller.dto.ForeignExchangePaymentStatusRequestDTO;
 import com.example.foreign.exchange.controller.converter.ForeignExchangePaymentConverter;
 import com.example.foreign.exchange.controller.dto.ForeignExchangePaymentResponseDTO;
-import com.example.foreign.exchange.controller.vo.ForeignExchangePaymentExcelVO;
+import com.example.foreign.exchange.application.entity.ForeignExchangePaymentExcelVO;
 import com.example.foreign.exchange.domain.enums.PaymentStatusResultEnum;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
@@ -141,28 +141,8 @@ public class ForeignExchangePaymentController {
         try {
             // 转换DTO为VO
             ForeignExchangePaymentQueryRequestVO vo = ForeignExchangePaymentConverter.foreignExchangePaymentQueryRequestDTO2VO(dto);
-            // 设置分页参数，查询所有数据（上限10万条）
-            vo.setPage(1L);
-            vo.setSize(100000L);
-            // 调用应用服务查询付款单列表
-            Page<ForeignExchangePaymentResponseVO> result = foreignExchangePaymentApplicationService.queryPaymentOrderList(vo);
-            
             // 转换为Excel VO列表
-            List<ForeignExchangePaymentExcelVO> excelVOList = new ArrayList<>();
-            for (ForeignExchangePaymentResponseVO payment : result.getRecords()) {
-                ForeignExchangePaymentExcelVO excelVO = new ForeignExchangePaymentExcelVO();
-                excelVO.setPaymentNo(payment.getPaymentNo());
-                excelVO.setExecuteNo(payment.getOrderNo());
-//                excelVO.setDirection(payment.get() == 1 ? "购汇" : "结汇");
-                excelVO.setCurrency(payment.getPayCurrency());
-                excelVO.setPaymentAmount(payment.getPaymentAmount());
-                excelVO.setSubjectAccountNo(payment.getSubjectAccountNo());
-                excelVO.setCounterpartyAccountNo(payment.getCounterpartyAccountNo());
-                excelVO.setPaymentTime(payment.getPaymentTime());
-                excelVO.setStatus(getStatusText(payment.getStatus()));
-                excelVO.setCreateTime(payment.getCreateTime());
-                excelVOList.add(excelVO);
-            }
+            List<ForeignExchangePaymentExcelVO> excelVOList = foreignExchangePaymentApplicationService.exportApplyList(vo);
             
             // 导出Excel
             EasyExcelUtil.exportExcel(response, excelVOList, "外汇交易付款列表", ForeignExchangePaymentExcelVO.class);
@@ -175,24 +155,6 @@ public class ForeignExchangePaymentController {
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
-        }
-    }
-    
-    /**
-     * 获取状态文本
-     */
-    private String getStatusText(Integer status) {
-        switch (status) {
-            case 0:
-                return "待支付";
-            case 1:
-                return "付款成功";
-            case 2:
-                return "付款失败";
-            case 3:
-                return "已取消";
-            default:
-                return "未知";
         }
     }
 

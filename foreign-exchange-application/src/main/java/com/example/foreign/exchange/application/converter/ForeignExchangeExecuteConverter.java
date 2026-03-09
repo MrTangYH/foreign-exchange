@@ -1,8 +1,10 @@
 package com.example.foreign.exchange.application.converter;
 
-import com.example.foreign.exchange.application.entity.ForeignExchangeExecuteQueryRequestVO;
-import com.example.foreign.exchange.application.entity.ForeignExchangeExecuteRequestVO;
+import com.example.foreign.exchange.application.entity.*;
 import com.example.foreign.exchange.domain.entity.ForeignExchangeOrder;
+import com.example.foreign.exchange.domain.enums.ExecuteStatusEnum;
+
+import java.util.Objects;
 
 /**
  * 外汇执行单转换器
@@ -60,5 +62,22 @@ public class ForeignExchangeExecuteConverter {
         execute.setUserId(vo.getUserId());
         
         return execute;
+    }
+
+    /**
+     * 执行executeVO转化成ExcelVO
+     */
+    public static ForeignExchangeExecuteExcelVO foreignExchangeExecuteResponseVOToExcelVO(ForeignExchangeExecuteResponseVO execute) {
+        ForeignExchangeExecuteExcelVO excelVO = new ForeignExchangeExecuteExcelVO();
+        excelVO.setExecuteNo(execute.getOrderNo());
+        excelVO.setApplyNo(execute.getApplyNo());
+        excelVO.setDirection(execute.getDirection() == 1 ? "购汇" : "结汇");
+        excelVO.setCurrency(execute.getCurrency());
+        excelVO.setExecuteAmount(execute.getAmount());
+        excelVO.setExecuteRate(execute.getRate());
+        excelVO.setExecuteTime(execute.getCreateTime());
+        excelVO.setStatus(Objects.requireNonNull(ExecuteStatusEnum.getByCode(execute.getStatus())).getMessage());
+        excelVO.setCreateTime(execute.getCreateTime());
+        return excelVO;
     }
 }

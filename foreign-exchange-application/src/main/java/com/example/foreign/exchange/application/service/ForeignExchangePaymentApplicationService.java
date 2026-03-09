@@ -1,10 +1,7 @@
 package com.example.foreign.exchange.application.service;
 
 import com.example.foreign.exchange.application.converter.ForeignExchangePaymentConverter;
-import com.example.foreign.exchange.application.entity.ForeignExchangePaymentQueryRequestVO;
-import com.example.foreign.exchange.application.entity.ForeignExchangePaymentRequestVO;
-import com.example.foreign.exchange.application.entity.ForeignExchangePaymentResponseVO;
-import com.example.foreign.exchange.application.entity.ForeignExchangePaymentStatusRequestVO;
+import com.example.foreign.exchange.application.entity.*;
 import com.example.foreign.exchange.common.entity.Page;
 import com.example.foreign.exchange.common.redis.RedisIdGenerator;
 import com.example.foreign.exchange.domain.entity.ForeignExchangePayment;
@@ -15,6 +12,9 @@ import com.example.foreign.exchange.domain.service.ForeignExchangeExecuteDomainS
 import com.example.foreign.exchange.domain.service.ForeignExchangePaymentDomainService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,6 +23,9 @@ import java.util.stream.Collectors;
  */
 @Service
 public class ForeignExchangePaymentApplicationService {
+
+    private static final Long excelQueryPage = 1L;
+    private static final Long excelQuerySize = 100000L;
     
     @Resource
     private RedisIdGenerator redisIdGenerator;
@@ -144,5 +147,26 @@ public class ForeignExchangePaymentApplicationService {
         vo.setUserId(payment.getUserId());
         vo.setCreateTime(payment.getCreateTime());
         return vo;
+    }
+
+    /**
+     * 导出外汇申请列表
+     */
+    public List<ForeignExchangePaymentExcelVO> exportApplyList(ForeignExchangePaymentQueryRequestVO request) {
+        request.setPage(excelQueryPage);
+        request.setSize(excelQuerySize);
+        Page<ForeignExchangePaymentResponseVO> executeList = queryPaymentOrderList(request);
+        List<ForeignExchangePaymentExcelVO> excelVOList = new ArrayList<>();
+        if (CollectionUtils.isEmpty(executeList.getRecords())) {
+            return new ArrayList<>();
+        }
+        excelVOList = executeList.getRecords()
+                // 1. 将列表转为Stream流
+                .stream()
+                // 2. 对流中的每个元素做转换（等同于循环里的Converter调用）
+                .map(ForeignExchangePaymentConverter::foreignExchangePaymentResponseVOToExcelVO)
+                // 3. 将转换后的流收集成List（指定ArrayList，和原逻辑保持一致）
+                .collect(Collectors.toList());
+        return excelVOList;
     }
 }

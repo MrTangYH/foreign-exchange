@@ -1,7 +1,8 @@
-package com.example.foreign.exchange.controller.vo;
+package com.example.foreign.exchange.application.entity;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 

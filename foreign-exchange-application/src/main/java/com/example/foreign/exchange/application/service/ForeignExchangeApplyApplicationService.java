@@ -2,9 +2,11 @@ package com.example.foreign.exchange.application.service;
 
 import com.example.foreign.exchange.application.converter.ForeignExchangeApplyConverter;
 import com.example.foreign.exchange.application.entity.ForeignExchangeApplyEditRequestVO;
+import com.example.foreign.exchange.application.entity.ForeignExchangeApplyExcelVO;
 import com.example.foreign.exchange.application.entity.ForeignExchangeApplyRequestVO;
 import com.example.foreign.exchange.application.entity.ForeignExchangeApplyResponseVO;
 import com.example.foreign.exchange.common.entity.Page;
+import com.example.foreign.exchange.common.utils.EasyExcelUtil;
 import com.example.foreign.exchange.domain.aggregate.ForeignExchangeApplyAggregate;
 import com.example.foreign.exchange.domain.entity.ForeignExchangeApply;
 import com.example.foreign.exchange.domain.repository.ForeignExchangeApplyRepository;
@@ -12,16 +14,23 @@ import com.example.foreign.exchange.common.redis.RedisIdGenerator;
 import com.example.foreign.exchange.domain.service.ForeignExchangeApplyDomainService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 外汇申请应用服务
  */
 @Service
 public class ForeignExchangeApplyApplicationService {
+
+    private static final Long excelQueryPage = 1L;
+    private static final Long excelQuerySize = 100000L;
+
     @Resource
     private RedisIdGenerator redisIdGenerator;
     
@@ -94,5 +103,26 @@ public class ForeignExchangeApplyApplicationService {
     public String changeStatus(String applyNo, Integer status) {
         // 调用领域服务变更状态
         return foreignExchangeApplyDomainService.changeStatus(applyNo, status);
+    }
+
+    /**
+     * 导出外汇申请列表
+     */
+    public List<ForeignExchangeApplyExcelVO> exportApplyList(ForeignExchangeApplyEditRequestVO request) {
+        request.setPage(excelQueryPage);
+        request.setSize(excelQuerySize);
+        Page<ForeignExchangeApplyResponseVO> applyList = queryApplyList(request);
+        List<ForeignExchangeApplyExcelVO> excelVOList = new ArrayList<>();
+        if (CollectionUtils.isEmpty(applyList.getRecords())) {
+            return new ArrayList<>();
+        }
+        excelVOList = applyList.getRecords()
+                // 1. 将列表转为Stream流
+                .stream()
+                // 2. 对流中的每个元素做转换（等同于循环里的Converter调用）
+                .map(ForeignExchangeApplyConverter::foreignExchangeApplyResponseVOToExcelVO)
+                // 3. 将转换后的流收集成List（指定ArrayList，和原逻辑保持一致）
+                .collect(Collectors.toList());
+        return excelVOList;
     }
 }

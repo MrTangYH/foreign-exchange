@@ -1,16 +1,19 @@
 package com.example.foreign.exchange.application.converter;
 
 import com.example.foreign.exchange.application.entity.ForeignExchangeApplyEditRequestVO;
+import com.example.foreign.exchange.application.entity.ForeignExchangeApplyExcelVO;
 import com.example.foreign.exchange.application.entity.ForeignExchangeApplyRequestVO;
 import com.example.foreign.exchange.application.entity.ForeignExchangeApplyResponseVO;
 import com.example.foreign.exchange.common.entity.Page;
 import com.example.foreign.exchange.domain.aggregate.ForeignExchangeApplyAggregate;
 import com.example.foreign.exchange.domain.entity.ForeignExchangeApply;
+import com.example.foreign.exchange.domain.enums.ApplyStatusEnum;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 外汇申请转换器
@@ -189,4 +192,29 @@ public class ForeignExchangeApplyConverter {
         responsePage.setRecords(responseList);
         return responsePage;
     }
+
+    /**
+     * 申请applyVO转化成ExcelVO
+     */
+    public static ForeignExchangeApplyExcelVO foreignExchangeApplyResponseVOToExcelVO(ForeignExchangeApplyResponseVO apply) {
+        ForeignExchangeApplyExcelVO excelVO = new ForeignExchangeApplyExcelVO();
+        excelVO.setApplyNo(apply.getApplyNo());
+        excelVO.setUserId(apply.getUserId());
+        excelVO.setDirection(apply.getDirection() == 1 ? "购汇" : "结汇");
+        excelVO.setCurrency(apply.getCurrency());
+        excelVO.setAmount(apply.getAmount());
+        excelVO.setRate(apply.getRate());
+        excelVO.setRmbAmount(apply.getRmbAmount());
+        excelVO.setTransactionSubject(apply.getTransactionSubject());
+        excelVO.setSubjectAccountNo(apply.getSubjectAccountNo());
+        excelVO.setPurpose(apply.getPurpose());
+        excelVO.setCounterparty(apply.getCounterparty());
+        excelVO.setCounterpartyAccountNo(apply.getCounterpartyAccountNo());
+        excelVO.setSwiftBic(apply.getSwiftBic());
+        excelVO.setStatus(Objects.requireNonNull(ApplyStatusEnum.getByCode(apply.getStatus())).getMessage());
+        excelVO.setSubmitTime(apply.getSubmitTime());
+        excelVO.setCreateTime(apply.getCreateTime());
+        return excelVO;
+    }
+
 }

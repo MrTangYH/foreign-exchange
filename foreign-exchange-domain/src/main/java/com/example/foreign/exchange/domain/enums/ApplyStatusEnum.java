@@ -30,4 +30,18 @@ public enum ApplyStatusEnum {
         }
         return null;
     }
+
+    /**
+     * 根据message获取枚举
+     */
+    public static ApplyStatusEnum getByMessage(String message) {
+        for (ApplyStatusEnum status : values()) {
+            if (status.getMessage().equals(message)) {
+                return status;
+            }
+        }
+        return null;
+    }
+
+
 }

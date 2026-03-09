@@ -11,7 +11,7 @@ import com.example.foreign.exchange.controller.dto.ForeignExchangeExecuteQueryRe
 import com.example.foreign.exchange.controller.dto.ForeignExchangeExecuteRequestDTO;
 import com.example.foreign.exchange.controller.converter.ForeignExchangeExecuteConverter;
 import com.example.foreign.exchange.controller.dto.ForeignExchangeExecuteResponseDTO;
-import com.example.foreign.exchange.controller.vo.ForeignExchangeExecuteExcelVO;
+import com.example.foreign.exchange.application.entity.ForeignExchangeExecuteExcelVO;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.util.CollectionUtils;
@@ -97,27 +97,9 @@ public class ForeignExchangeExecuteController {
         try {
             // 转换DTO为VO
             ForeignExchangeExecuteQueryRequestVO vo = ForeignExchangeExecuteConverter.foreignExchangeExecuteQueryRequestDTO2VO(dto);
-            // 设置分页参数，查询所有数据（上限10万条）
-            vo.setPage(1L);
-            vo.setSize(100000L);
-            // 调用应用服务查询执行单列表
-            Page<ForeignExchangeExecuteResponseVO> result = foreignExchangeExecuteApplicationService.queryExecuteOrderList(vo);
             
             // 转换为Excel VO列表
-            List<ForeignExchangeExecuteExcelVO> excelVOList = new ArrayList<>();
-            for (ForeignExchangeExecuteResponseVO execute : result.getRecords()) {
-                ForeignExchangeExecuteExcelVO excelVO = new ForeignExchangeExecuteExcelVO();
-                excelVO.setExecuteNo(execute.getOrderNo());
-                excelVO.setApplyNo(execute.getApplyNo());
-                excelVO.setDirection(execute.getDirection() == 1 ? "购汇" : "结汇");
-                excelVO.setCurrency(execute.getCurrency());
-                excelVO.setExecuteAmount(execute.getAmount());
-                excelVO.setExecuteRate(execute.getRate());
-                excelVO.setExecuteTime(execute.getCreateTime());
-                excelVO.setStatus(getStatusText(execute.getStatus()));
-                excelVO.setCreateTime(execute.getCreateTime());
-                excelVOList.add(excelVO);
-            }
+            List<ForeignExchangeExecuteExcelVO> excelVOList = foreignExchangeExecuteApplicationService.exportApplyList(vo);
             
             // 导出Excel
             EasyExcelUtil.exportExcel(response, excelVOList, "外汇交易执行列表", ForeignExchangeExecuteExcelVO.class);
@@ -132,22 +114,5 @@ public class ForeignExchangeExecuteController {
             }
         }
     }
-    
-    /**
-     * 获取状态文本
-     */
-    private String getStatusText(Integer status) {
-        switch (status) {
-            case 1:
-                return "执行单已生成";
-            case 2:
-                return "执行单已生成付款单";
-            case 3:
-                return "执行单已取消";
-            case 4:
-                return "执行单已作废";
-            default:
-                return "未知";
-        }
-    }
+
 }

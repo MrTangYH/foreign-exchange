@@ -1,10 +1,10 @@
-package com.example.foreign.exchange.controller.vo;
+package com.example.foreign.exchange.application.entity;
 
 import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * 外汇申请Excel导出VO

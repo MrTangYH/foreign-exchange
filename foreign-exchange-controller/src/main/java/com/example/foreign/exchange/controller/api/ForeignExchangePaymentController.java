@@ -4,7 +4,7 @@ import com.example.foreign.exchange.application.entity.*;
 import com.example.foreign.exchange.application.entity.ForeignExchangePaymentQueryRequestVO;
 import com.example.foreign.exchange.application.service.ForeignExchangePaymentApplicationService;
 import com.example.foreign.exchange.common.entity.Page;
-import com.example.foreign.exchange.common.util.EasyExcelUtil;
+import com.example.foreign.exchange.common.utils.EasyExcelUtil;
 import com.example.foreign.exchange.controller.dto.ApiResponseDTO;
 import com.example.foreign.exchange.controller.dto.ForeignExchangePaymentQueryRequestDTO;
 import com.example.foreign.exchange.controller.dto.ForeignExchangePaymentRequestDTO;

@@ -1,4 +1,4 @@
-package com.example.foreign.exchange.domain.Impl;
+package com.example.foreign.exchange.domain.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;

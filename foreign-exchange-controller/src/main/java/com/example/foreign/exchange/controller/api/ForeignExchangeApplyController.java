@@ -1,16 +1,14 @@
 package com.example.foreign.exchange.controller.api;
 
 import com.example.foreign.exchange.application.entity.ForeignExchangeApplyEditRequestVO;
-import com.example.foreign.exchange.application.entity.ForeignExchangeApplyEditRequestVO;
 import com.example.foreign.exchange.application.entity.ForeignExchangeApplyRequestVO;
 import com.example.foreign.exchange.application.entity.ForeignExchangeApplyResponseVO;
 import com.example.foreign.exchange.application.service.ForeignExchangeApplyApplicationService;
 import com.example.foreign.exchange.common.entity.Page;
-import com.example.foreign.exchange.common.util.EasyExcelUtil;
+import com.example.foreign.exchange.common.utils.EasyExcelUtil;
 import com.example.foreign.exchange.controller.converter.ForeignExchangeApplyConverter;
 import com.example.foreign.exchange.controller.dto.*;
 import com.example.foreign.exchange.controller.vo.ForeignExchangeApplyExcelVO;
-import com.example.foreign.exchange.domain.entity.ForeignExchangeApply;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.util.CollectionUtils;
@@ -18,9 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 外汇申请模块

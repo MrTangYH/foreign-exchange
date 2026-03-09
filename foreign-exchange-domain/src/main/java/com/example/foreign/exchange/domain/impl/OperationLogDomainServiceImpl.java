@@ -1,4 +1,4 @@
-package com.example.foreign.exchange.domain.Impl;
+package com.example.foreign.exchange.domain.impl;
 
 import com.example.foreign.exchange.domain.entity.OperationLog;
 import com.example.foreign.exchange.domain.repository.OperationLogRepository;

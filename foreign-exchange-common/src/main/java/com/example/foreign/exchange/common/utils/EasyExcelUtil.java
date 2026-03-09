@@ -1,4 +1,4 @@
-package com.example.foreign.exchange.common.util;
+package com.example.foreign.exchange.common.utils;
 
 import com.alibaba.excel.EasyExcel;
 import jakarta.servlet.http.HttpServletResponse;

@@ -1,9 +1,8 @@
-package com.example.foreign.exchange.domain.Impl;
+package com.example.foreign.exchange.domain.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.example.foreign.exchange.common.entity.Page;
-import com.example.foreign.exchange.domain.entity.ForeignExchangeApply;
 import com.example.foreign.exchange.domain.entity.ForeignExchangeOrder;
 import com.example.foreign.exchange.domain.repository.ForeignExchangeOrderRepository;
 import com.example.foreign.exchange.domain.service.ForeignExchangeExecuteDomainService;

@@ -14,6 +14,9 @@ public class SseUtil {
         } catch (IOException e) {
             log.error("SSE发送消息失败", e);
             throw new RuntimeException(e);
+        } catch (IllegalStateException e) {
+            // 发射器已完成，忽略此异常
+            log.debug("SSE发射器已完成，无法发送消息", e);
         }
     }
 

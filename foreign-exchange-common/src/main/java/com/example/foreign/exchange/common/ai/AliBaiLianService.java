@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -24,7 +25,7 @@ import java.util.concurrent.TimeUnit;
  * 阿里百炼服务类
  * 用于调用阿里百炼的 API，支持普通输出和流式输出
  */
-@Service
+@Component
 public class AliBaiLianService {
 
     private final AliBaiLianConfig aliBaiLianConfig;

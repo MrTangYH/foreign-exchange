@@ -36,9 +36,22 @@ public class ForeignExchangeExecuteApplicationService {
      * @return 生成结果
      */
     public String submitExecuteOrder(ForeignExchangeExecuteRequestVO request) {
+        ForeignExchangeExecuteQueryRequestVO foreignExchangeExecuteQueryRequestVO = new ForeignExchangeExecuteQueryRequestVO();
+        foreignExchangeExecuteQueryRequestVO.setApplyNo(request.getApplyNo());
+        Page<ForeignExchangeExecuteResponseVO> foreignExchangeExecuteQueryRequestVOList = queryExecuteOrderList(foreignExchangeExecuteQueryRequestVO);
+        if (!CollectionUtils.isEmpty(foreignExchangeExecuteQueryRequestVOList.getRecords())) {
+            return "交易执行单已存在，请勿重新创建，单号：" + foreignExchangeExecuteQueryRequestVOList.getRecords().get(0).getOrderNo();
+        }
+        // 创建执行单实体
+        ForeignExchangeOrder order = convertToPO(request);
+        
+        // 调用领域服务保存执行单
+        return foreignExchangeExecuteDomainService.saveExecuteOrder(order);
+    }
+
+    public ForeignExchangeOrder convertToPO(ForeignExchangeExecuteRequestVO request) {
         // 生成执行单号
         String orderNo = redisIdGenerator.generateOrderNo();
-        
         // 创建执行单实体
         ForeignExchangeOrder order = new ForeignExchangeOrder();
         order.setOrderNo(orderNo);
@@ -55,9 +68,7 @@ public class ForeignExchangeExecuteApplicationService {
         order.setStatus(ExecuteStatusEnum.GENERATED.getCode());
         order.setUserId(request.getUserId());
         order.setDirection(request.getDirection());
-        
-        // 调用领域服务保存执行单
-        return foreignExchangeExecuteDomainService.saveExecuteOrder(order);
+        return order;
     }
 
     /**

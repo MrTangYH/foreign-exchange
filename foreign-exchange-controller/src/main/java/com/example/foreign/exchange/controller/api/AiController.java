@@ -1,13 +1,28 @@
 package com.example.foreign.exchange.controller.api;
 
+import com.example.foreign.exchange.application.service.AiChatService;
+import com.example.foreign.exchange.application.service.ForeignExchangeApplyApplicationService;
+import com.example.foreign.exchange.common.ai.OpenWebUiService;
+import com.example.foreign.exchange.controller.converter.ForeignExchangeApplyConverter;
+import com.example.foreign.exchange.application.entity.ForeignExchangeApplyEditRequestVO;
 import com.example.foreign.exchange.common.ai.AliBaiLianService;
 import com.example.foreign.exchange.controller.dto.ApiResponseDTO;
+import com.example.foreign.exchange.controller.dto.ForeignExchangeApplyEditRequestDTO;
+import com.example.foreign.exchange.common.utils.SseUtil;
 import jakarta.annotation.Resource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.util.concurrent.TimeUnit;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 
 /**
  * AI 测试控制器
@@ -20,7 +35,18 @@ public class AiController {
     @Resource
     private AliBaiLianService aliBaiLianService;
 
+    @Resource
+    private AiChatService aiChatService;
 
+    @Resource
+    private OpenWebUiService openWebUiService;
+
+    // API密钥
+    private static final String API_KEY = "sk-101170a11741496fb8a30a3873ac5836";
+    // API端点
+    private static final String API_ENDPOINT = "http://localhost:3000/api/v1/messages";
+    // JSON解析器
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * 普通输出测试
@@ -70,4 +96,24 @@ public class AiController {
         
         return emitter;
     }
+
+    /**
+     * 基于外汇申请的流式AI分析
+     * @param request 外汇申请编辑请求DTO
+     * @return SseEmitter，用于流式输出
+     */
+    @PostMapping("/stream/analyze")
+    public SseEmitter streamAnalyzeForeignExchange(@RequestBody ForeignExchangeApplyEditRequestDTO request) {
+        ForeignExchangeApplyEditRequestVO requestVO = ForeignExchangeApplyConverter.foreignExchangeApplyEditRequestDTO2VO(request);
+        return aiChatService.streamCall(requestVO);
+    }
+
+    /**
+     * 对话式聊天
+     */
+    @PostMapping("/stream/chat")
+    public SseEmitter streamChat(@RequestParam String prompt) {
+        return openWebUiService.streamCall(prompt);
+    }
+
 }

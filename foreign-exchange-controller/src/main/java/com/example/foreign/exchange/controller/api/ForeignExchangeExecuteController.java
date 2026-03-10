@@ -1,5 +1,6 @@
 package com.example.foreign.exchange.controller.api;
 
+import com.alibaba.excel.util.StringUtils;
 import com.example.foreign.exchange.application.entity.ForeignExchangeExecuteQueryRequestVO;
 import com.example.foreign.exchange.application.entity.ForeignExchangeExecuteRequestVO;
 import com.example.foreign.exchange.application.entity.ForeignExchangeExecuteResponseVO;
@@ -14,6 +15,7 @@ import com.example.foreign.exchange.controller.dto.ForeignExchangeExecuteRespons
 import com.example.foreign.exchange.application.entity.ForeignExchangeExecuteExcelVO;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.poi.util.StringUtil;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,6 +46,13 @@ public class ForeignExchangeExecuteController {
             ForeignExchangeExecuteRequestVO vo = ForeignExchangeExecuteConverter.foreignExchangeExecuteRequestDTO2VO(dto);
             // 调用应用服务生成执行单
             String result = foreignExchangeExecuteApplicationService.submitExecuteOrder(vo);
+            if (StringUtils.isEmpty(result)){
+                return ApiResponseDTO.fail(400, "生成执行单失败");
+            }
+            // todo:硬编码判断交易执行单是否生成成功，后续修改
+            if (result.charAt(0) == '交'){
+                return ApiResponseDTO.fail(400, "请勿重复创建交易执行单");
+            }
             // 返回结果
             return ApiResponseDTO.success("交易执行单生成成功", result);
         } catch (Exception e) {
